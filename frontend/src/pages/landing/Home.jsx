@@ -216,11 +216,11 @@ export default function Home() {
         <img
           src="/images/kids service.jpg"
           alt="Women Hair Tools"
-          className="w-full h-48 md:h-55 object-cover rounded mb-4"
+          className="w-full h-48 md:h-70 object-cover rounded mb-4"
         />
         </div>
         <div>
-        <p className="text-gray-600 max-w-3xl mx-auto mb-10">
+        <p className="text-gray-600 max-w-3xl mx-auto">
       We take care of the Little ones too, since they are the future of this World <br />
       We make your children look angelic by our services and our environment is aligned to accomodate any child at any age.    
     </p>
