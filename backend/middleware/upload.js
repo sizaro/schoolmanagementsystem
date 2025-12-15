@@ -16,11 +16,18 @@ const storage = multer.diskStorage({
     cb(null, IMAGES_DIR);
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    const userId = req.params.id || "user";
-    const filename = `${userId}-${Date.now()}${ext}`;
-    cb(null, filename);
-  },
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  let prefix = "file";
+
+  if (file.fieldname === "image_url") prefix = "user";
+  if (file.fieldname === "service_image") prefix = "service";
+  if (file.fieldname === "product_image") prefix = "product";
+
+  const filename = `${prefix}-${Date.now()}${ext}`;
+  cb(null, filename);
+},
+
 });
 
 // Filter allowed image types

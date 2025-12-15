@@ -4,6 +4,11 @@ import Footer from "../../components/common/Footer";
 import { useData } from "../../context/DataContext";
 
 export default function Home() {
+
+  const staticBaseUrl =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5500"
+    : "https://salonmanagementsystemv2.onrender.com";
   const { serviceDefinitions = [], fetchServiceDefinitions } = useData();
 
   useEffect(() => {
@@ -59,7 +64,7 @@ export default function Home() {
             >
               <div className="h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
                 <img
-                  src={`/images/service-${i + 1}.jpg`}
+                  src={`${staticBaseUrl}${service.image_url}` || `image`}
                   alt={service.service_name}
                   className="w-full h-full object-cover"
                 />

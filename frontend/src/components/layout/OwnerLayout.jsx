@@ -16,7 +16,7 @@ const OwnerLayout = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       <OwnerSidebar />
-      <main className="flex-1 p-6 overflow-y-auto w-full mt-15 ml-0 md:ml-64 sm:mt-6">
+      <main className="flex-1 p-6 overflow-y-auto w-full mt-18 ml-[-10px] md:ml-64 md:mt-6">
         <Routes>
           {/* Dashboard */}
           <Route index element={<OwnerDashboard />} />

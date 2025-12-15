@@ -56,7 +56,7 @@ export const getServicesByDay = async (startOfDay, endOfDay) => {
     ) mat ON TRUE
 
     WHERE 
-      st.service_timestamp BETWEEN $1 AND $2
+      (st.service_timestamp) BETWEEN $1 AND $2
       AND (st.status IS NULL OR LOWER(st.status) = 'completed')
 
     ORDER BY st.service_timestamp DESC;
@@ -64,8 +64,8 @@ export const getServicesByDay = async (startOfDay, endOfDay) => {
 
   const { rows } = await db.query(query, [startOfDay, endOfDay]);
 
-  // deduplicate materials in JS
-  const result = rows.map(row => {
+  // deduplicate materials
+  return rows.map(row => {
     if (Array.isArray(row.materials)) {
       row.materials = Array.from(
         new Map(row.materials.map(m => [m.material_name, m])).values()
@@ -75,9 +75,6 @@ export const getServicesByDay = async (startOfDay, endOfDay) => {
     }
     return row;
   });
-
-  console.log("services in the daily model", result);
-  return result;
 };
 
 

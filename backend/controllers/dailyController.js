@@ -1,33 +1,24 @@
 import dailyModel from '../models/dailyModel.js';
 
+
+
 export async function getDailyReport(req, res) {
   try {
     const { date } = req.query;
+    if (!date) return res.status(400).json({ error: "Missing date" });
 
-    // If no date provided, return empty arrays
-    if (!date) {
-      return res.json({
-        services: [],
-        expenses: [],
-        advances: [],
-        clockings: [],
-        employees: [],
-        tagFees: [],
-        lateFees: []
-      });
-    }
+    const getDayRangeUG = (dateString) => {
+      console.log("incoming date string", dateString)
+  const start = new Date(`${dateString}T00:00:00+03:00`);
+  const end   = new Date(`${dateString}T23:59:59.999+03:00`);
+  return { start, end };
+};
 
-    // Convert date string to Date object
-    const selectedDate = new Date(date);
 
-    // Define the start and end of the day
-    const startOfDay = new Date(selectedDate);
-    startOfDay.setHours(0, 0, 0, 0);
+    const { start, end } = getDayRangeUG(date);
+    console.log("start is", start)
+    console.log("end is", end)
 
-    const endOfDay = new Date(selectedDate);
-    endOfDay.setHours(23, 59, 59, 999);
-
-    // Fetch all datasets concurrently
     const [
       services,
       expenses,
@@ -37,15 +28,16 @@ export async function getDailyReport(req, res) {
       lateFees,
       employees
     ] = await Promise.all([
-      dailyModel.getServicesByDay(startOfDay.toISOString(), endOfDay.toISOString()),
-      dailyModel.getExpensesByDay(startOfDay.toISOString(), endOfDay.toISOString()),
-      dailyModel.getAdvancesByDay(startOfDay.toISOString(), endOfDay.toISOString()),
-      dailyModel.getClockingsByDay(startOfDay.toISOString(), endOfDay.toISOString()),
-      dailyModel.getTagFeesByDay(startOfDay.toISOString(), endOfDay.toISOString()),
-      dailyModel.getLateFeesByDay(startOfDay.toISOString(), endOfDay.toISOString()),
+      dailyModel.getServicesByDay(start.toISOString(), end.toISOString()),
+      dailyModel.getExpensesByDay(start.toISOString(), end.toISOString()),
+      dailyModel.getAdvancesByDay(start.toISOString(), end.toISOString()),
+      dailyModel.getClockingsByDay(start.toISOString(), end.toISOString()),
+      dailyModel.getTagFeesByDay(start.toISOString(), end.toISOString()),
+      dailyModel.getLateFeesByDay(start.toISOString(), end.toISOString()),
       dailyModel.fetchAllEmployees()
     ]);
 
+    
     console.log("✅ Daily Report Generated:", {
       date,
       servicesCount: services,
@@ -56,7 +48,7 @@ export async function getDailyReport(req, res) {
       lateFeesCount: lateFees
     });
 
-    // Return all data in one object
+
     res.json({
       services,
       expenses,

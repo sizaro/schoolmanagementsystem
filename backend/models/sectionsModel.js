@@ -27,15 +27,18 @@ export const createSectionModel = async (sectionData) => {
 };
 
 // Update a section
-export const updateSectionModel = async (id, sectionData) => {
-  const { name, description } = sectionData;
+export const updateSectionModel = async (sectionData) => {
+  console.log("object in update section model", sectionData)
+  const { section_name, id } = sectionData;
+  console.log("id in update section model", id)
+  
   const query = `
     UPDATE service_sections
-    SET name = $1, description = $2
-    WHERE id = $3
+    SET section_name = $1
+    WHERE id = $2
     RETURNING *
   `;
-  const result = await db.query(query, [name, description, id]);
+  const result = await db.query(query, [section_name, id]);
   return result.rows[0];
 };
 

@@ -32,6 +32,11 @@ export default function customerDashboard() {
     fetchUsers 
   } = useData();
 
+  const staticBaseUrl =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5500"
+    : "https://salonmanagementsystemv2.onrender.com";
+
   // Filter employees (exclude Saleh & customers)
   const employees = useMemo(
     () =>
@@ -224,12 +229,15 @@ export default function customerDashboard() {
               }`}
             >
               <img
-                src={emp.image_url || "/default-avatar.png"}
+                src={`${staticBaseUrl}${emp.image_url}` || "/default-avatar.png"}
                 alt={emp.first_name}
                 className="w-16 h-16 rounded-full mx-auto object-cover"
               />
               <p className="mt-2 font-medium">
-                {emp.first_name} {emp.last_name}
+               {emp.last_name}
+              </p>
+              <p className="mt-2 font-medium">
+                {emp.specialty}
               </p>
             </div>
           ))}

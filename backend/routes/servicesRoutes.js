@@ -37,10 +37,10 @@ router.get('/service_definitions', getServiceDefinitions);
 router.get('/service_definitions/:id', getServiceDefinitionById);
 
 // 👉 create a service definition with optional image upload
-router.post('/service_definitions/create', upload.single("image_url"), createServiceDefinition);
+router.post('/service_definitions/create', upload.single("service_image"), createServiceDefinition);
 
 // 👉 update a service definition by ID with optional image upload
-router.put('/service_definitions/:id', upload.single("image_url"), updateServiceDefinition);
+router.put('/service_definitions/:id', upload.single("service_image"), updateServiceDefinition);
 
 // 👉 delete a service definition by ID
 router.delete('/service_definitions/:id', deleteServiceDefinition);

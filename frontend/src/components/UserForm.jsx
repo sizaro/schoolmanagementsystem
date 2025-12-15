@@ -274,7 +274,11 @@ const UserForm = ({ user, onSubmit, onClose, role = "" }) => {
                 type="text"
                 name="role"
                 value={formData.role}
-                onChange={handleChange}
+                onChange={(e) =>
+    setFormData((prev) => ({
+      ...prev,
+      role: e.target.value.toLowerCase(),
+    }))}
                 placeholder="e.g., manager or employee"
                 className="mt-1 block w-full border rounded-md p-2"
               />

@@ -52,7 +52,6 @@ app.use((req, res, next) => {
 
 app.use(cors({
   origin: (origin, callback) => {
-    console.log("🌍 CORS Origin:", origin);
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
     return callback(new Error("Not allowed by CORS"));
@@ -86,7 +85,7 @@ const sessionStore = new PgSessionStore({
           port: 5433,
           user: "postgres",
           password: "postgres",
-          database: "salon_dev",
+          database: "salonmanagementsystemv2_db",
           ssl: false,
         },
       }),

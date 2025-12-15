@@ -4,6 +4,10 @@ import Footer from "../../components/common/Footer";
 import { useData } from "../../context/DataContext";
 
 export default function Services() {
+    const staticBaseUrl =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5500"
+    : "https://salonmanagementsystemv2.onrender.com";
   // Service Data
   const { serviceDefinitions = [], fetchServiceDefinitions } = useData();
 
@@ -27,7 +31,7 @@ export default function Services() {
               <div className="h-40 bg-gray-200 rounded-lg mb-4 flex items-center justify-center text-gray-500 overflow-hidden">
                 {service.image_url ? (
                   <img
-                    src={service.image_url}
+                    src={`${staticBaseUrl}${service.image_url}` || `image`}
                     alt={service.service_name}
                     className="w-full h-full object-cover rounded-lg"
                   />

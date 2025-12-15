@@ -103,6 +103,7 @@ const pendingCount = pendingAppointments.length;
       const res = await axios.get(`${API_URL}/reports/weekly`, {
         params: { startDate: formatDate(start), endDate: formatDate(end) },
       });
+            console.log("data in weekly context", res.lateFeeData)
       const data = res.data;
       setServices(data.services);
       console.log("service transactions in daily context", data.services)
@@ -202,7 +203,6 @@ const pendingCount = pendingAppointments.length;
     try {
       const res = await axios.get(`${API_URL}/users`);
       setUsers(res.data);
-      console.log("users in context:", res.data);
       return res.data;
     } catch (err) {
       console.error("Error fetching employees:", err);
@@ -482,6 +482,18 @@ const pendingCount = pendingAppointments.length;
     }
   };
 
+  const fetchSectionById = async (id) => {
+  try {
+    if (!id) throw new Error("Section ID is required");
+    const res = await axios.get(`${API_URL}/sections/${id}`);
+    console.log(`Section ${id}:`, res.data);
+    return res.data; // returns the single section object
+  } catch (err) {
+    console.error(`Error fetching section with ID ${id}:`, err);
+    throw err;
+  }
+};
+
   // ---------- Sections CRUD ----------
 
 const createSection = async (sectionData) => {
@@ -667,7 +679,7 @@ const fetchServiceTransactionsApp = async () => {
   try {
     const res = await axios.get(`${API_URL}/services/service_transactions`);
     setTransactions(res.data.data);
-    console.log("service transactions in the data context", res.data.data)
+    console.log("service appointments in the data context", res.data.data)
     return res.data.data;
   } catch (err) {
     console.error("Error fetching service transactions:", err);
@@ -896,6 +908,7 @@ useEffect(() => {
         fetchServiceRoles,
         fetchServiceMaterials,
         fetchSections,
+        fetchSectionById,
         createSection,
         updateSection,
         deleteSection,

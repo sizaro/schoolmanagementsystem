@@ -59,7 +59,7 @@ export const getServicesByDateRange = async (startDate, endDate) => {
     ) mat ON TRUE
 
     WHERE 
-      st.service_timestamp BETWEEN $1 AND $2
+      (st.service_timestamp AT TIME ZONE 'Africa/Kampala') BETWEEN $1 AND $2
       AND (st.status IS NULL OR LOWER(st.status) = 'completed')
 
     ORDER BY st.service_timestamp DESC;
@@ -67,7 +67,7 @@ export const getServicesByDateRange = async (startDate, endDate) => {
 
   const { rows } = await db.query(query, [startDate, endDate]);
 
-  // Deduplicate materials in JS
+  // Remove duplicate materials if needed
   const result = rows.map(row => {
     if (Array.isArray(row.materials)) {
       row.materials = Array.from(
@@ -83,6 +83,7 @@ export const getServicesByDateRange = async (startDate, endDate) => {
   return result;
 };
 
+
 // ===============================
 // EXPENSES
 // ===============================
@@ -91,7 +92,7 @@ export const getExpensesByDateRange = async (startDate, endDate) => {
     "SELECT * FROM expenses WHERE created_at BETWEEN $1 AND $2 ORDER BY id DESC",
     [startDate, endDate]
   );
-  return result.rows;
+  return result;
 };
 
 // ===============================
@@ -109,7 +110,7 @@ export const getAdvancesByDateRange = async (startDate, endDate) => {
     ORDER BY a.id DESC;
   `;
   const result = await db.query(query, [startDate, endDate]);
-  return result.rows;
+  return result;
 };
 
 // ===============================
@@ -124,7 +125,7 @@ export const getTagFeesByDateRange = async (startDate, endDate) => {
     ORDER BY tf.id DESC;
   `;
   const result = await db.query(query, [startDate, endDate]);
-  return result.rows;
+  return result;
 };
 
 // ===============================
@@ -139,7 +140,7 @@ export const getLateFeesByDateRange = async (startDate, endDate) => {
     ORDER BY lf.id DESC;
   `;
   const result = await db.query(query, [startDate, endDate]);
-  return result.rows;
+  return result;
 };
 
 // ===============================

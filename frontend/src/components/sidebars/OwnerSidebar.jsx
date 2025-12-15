@@ -50,18 +50,6 @@ export default function OwnerSidebar() {
 
         <button onClick={() => setMenuOpen(true)} className="text-2xl focus:outline-none">☰</button>
       </div>
-      <li className="relative">
-  <Link to="/owner/dashboard" className={linkClass('/owner/dashboard')}>
-    pending:
-
-    {/* 🔥 Pending Badge */}
-    {pendingCount > 0 && (
-      <span className="absolute right-3 top-1/2 -translate-y-1/2 bg-red-600 text-white text-xs px-2 py-0.5 list-none rounded-full">
-        {pendingCount}
-      </span>
-    )}
-  </Link>
-</li>
 
 
       {/* Desktop Sidebar */}

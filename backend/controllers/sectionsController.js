@@ -45,7 +45,7 @@ export const createSection = async (req, res) => {
 export const updateSection = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedSection = await updateSectionModel(id, req.body);
+    const updatedSection = await updateSectionModel(req.body);
     if (!updatedSection) return res.status(404).json({ error: "Section not found" });
     res.status(200).json(updatedSection);
   } catch (err) {

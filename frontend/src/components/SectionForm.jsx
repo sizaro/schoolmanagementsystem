@@ -35,6 +35,7 @@ export default function SectionForm({ existingSection = null, onSubmit, onClose 
 
     setSubmitting(true);
     try {
+      console.log("section id submitted", formData.id)
       await onSubmit({ ...formData, section_name: trimmedName });
       onClose && onClose();
     } catch (err) {

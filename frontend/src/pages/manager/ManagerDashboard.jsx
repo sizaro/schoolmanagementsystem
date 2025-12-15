@@ -307,12 +307,6 @@ export default function ManagerDashboard() {
         <Button onClick={() => setModalType("tagfee")}>Add Tag Fee</Button>
         <Button onClick={() => setModalType("latefee")}>Add Late Fee</Button>
 
-        <h2 className="text-lg font-semibold mt-10">Service Setup</h2>
-        <div className="flex gap-3 mt-3">
-          <Button onClick={() => setModalType("new_section")}>Add Section</Button>
-          <Button onClick={() => setModalType("new_service_definition")}>Add New Service</Button>
-        </div>
-
         <section className="bg-white shadow-md rounded-lg p-4 mb-6">
   <h2 className="text-xl font-semibold text-blue-700 mb-4">Appointments</h2>
 

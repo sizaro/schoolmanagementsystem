@@ -51,11 +51,23 @@ const OwnerIncomeReport = () => {
 
   console.log("users in the daily page", users)
 
-  const toYMD = (date) => date.toISOString().split("T")[0];
+  const toYMD = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 
   const today = new Date();
-  const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-  const reportDate = today.toLocaleDateString("en-US", options);
+  const options = {
+  weekday: "long",
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "Africa/Kampala",
+};;
+  const reportDate = today.toLocaleDateString("en-UG", options);
 
   const session = sessions && sessions.length > 0 ? sessions[0] : null;
 
@@ -235,6 +247,7 @@ const OwnerIncomeReport = () => {
   fetchUsers();
 };
 
+
 const handleWeekChange = (e) => {
   const weekString = e.target.value;
   console.log("handleWeekChange called with weekString:", weekString);
@@ -243,24 +256,34 @@ const handleWeekChange = (e) => {
 
   const [year, week] = weekString.split("-W").map(Number);
 
-  const firstDayOfYear = new Date(year, 0, 1);
-  const day = firstDayOfYear.getDay();
+  // 1️⃣ Get first day of year in Uganda time
+  const firstDayOfYear = new Date(Date.UTC(year, 0, 1));
+  const day = firstDayOfYear.getUTCDay(); // 0=Sun, 1=Mon, ..., 6=Sat
   const firstMonday = new Date(firstDayOfYear);
-  const diff = day <= 4 ? day - 1 : day - 8;
-  firstMonday.setDate(firstDayOfYear.getDate() - diff);
+  const diff = day <= 4 ? 1 - day : 8 - day; // ISO week calculation
+  firstMonday.setUTCDate(firstDayOfYear.getUTCDate() + diff);
 
+  // 2️⃣ Compute Monday of desired week
   const monday = new Date(firstMonday);
-  monday.setDate(firstMonday.getDate() + (week - 1) * 7);
+  monday.setUTCDate(firstMonday.getUTCDate() + (week - 1) * 7);
+  monday.setUTCHours(0, 0, 0, 0);
+
+  // 3️⃣ Compute Sunday of desired week
   const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+  sunday.setUTCHours(23, 59, 59, 999);
+
+  console.log("Computed weekly range in UTC:", monday, "→", sunday);
 
   setWeek({ start: monday, end: sunday });
   setReportLabel(
-    `${monday.toLocaleDateString("en-US")} → ${sunday.toLocaleDateString("en-US")}`
+    `${monday.toLocaleDateString("en-UG", { timeZone: "Africa/Kampala" })} → ${sunday.toLocaleDateString("en-UG", { timeZone: "Africa/Kampala" })}`
   );
+
   fetchWeeklyData(monday, sunday);
   fetchUsers();
 };
+
 
 const handleMonthChange = (e) => {
   console.log("handleMonthChange called with value:", e.target.value);

@@ -3,7 +3,7 @@ import { useData } from "../../context/DataContext.jsx";
 import { Bar } from "react-chartjs-2";
 import Chart from "chart.js/auto";
 
-const EmployeeIncomeDailyReport = () => {
+const EmployeeIncomeReport = () => {
   const {
       services = [],
       serviceMaterials = [],
@@ -543,4 +543,4 @@ const EmployeeIncomeDailyReport = () => {
     );
   };
 
-export default EmployeeIncomeDailyReport;
+export default EmployeeIncomeReport;

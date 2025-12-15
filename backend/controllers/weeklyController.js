@@ -1,70 +1,66 @@
 import WeeklyModel from "../models/weeklyModel.js";
 
-// Controller to handle requests for weekly reports
+// Helper to get week range in Uganda time
+const getWeekRange = (dateInput) => {
+  console.log("Input date:", dateInput);
+
+  const date = new Date(dateInput);
+  console.log("Original date object:", date);
+
+  const day = date.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  console.log("Day of week (0=Sun):", day);
+
+  // Calculate Monday (adjust if Sunday)
+  const diff = day === 0 ? -6 : 1 - day;
+  const monday = new Date(date);
+  monday.setDate(date.getDate() + diff);
+  monday.setHours(0, 0, 0, 0);
+  console.log("Monday start local:", monday);
+
+  // Uganda offset: convert local to UTC for DB
+  const mondayUTC = new Date(monday.getTime() - monday.getTimezoneOffset() * 60000);
+  console.log("Monday UTC for DB:", mondayUTC);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+  console.log("Sunday end local:", sunday);
+
+  const sundayUTC = new Date(sunday.getTime() - sunday.getTimezoneOffset() * 60000);
+  console.log("Sunday UTC for DB:", sundayUTC);
+
+  return { monday, sunday, mondayUTC, sundayUTC };
+};
+
+// Controller to get weekly report
 export const getWeeklyReport = async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
-    console.log("Received in the controller startDate:", startDate, "endDate:", endDate);
+    const { startDate } = req.query;
+    if (!startDate) return res.status(400).json({ error: "Missing startDate query param" });
 
-    const today = new Date();
-    const rangeStart = new Date(startDate);
-    let rangeEnd = new Date(endDate);
-    let scenario = "";
+    const { mondayUTC, sundayUTC } = getWeekRange(startDate);
+    console.log("Querying services from", mondayUTC, "to", sundayUTC);
 
-    // Scenario 3: Future week
-    if (rangeStart > today) {
-      scenario = "future";
-      return res.json({
-        scenario,
-        services: [],
-        expenses: [],
-        advances: [],
-        tagFees: [],
-        lateFees: []
-      });
-    }
-
-    // Scenario 1: Current week (today is inside the selected range)
-    if (rangeStart <= today && rangeEnd >= today) {
-      scenario = "current";
-      const yesterday = new Date(today);
-      yesterday.setDate(today.getDate() - 1);
-      yesterday.setHours(23, 59, 59, 999); // include full yesterday
-      rangeEnd = yesterday;
-    }
-
-    // Scenario 2: Past week (completely before today)
-    if (rangeEnd < today) {
-      scenario = "past";
-      // no changes to start/end, just use full week
-    }
-
-    // Fetch DB data (including tag fees and late fees)
     const [services, expenses, advances, tagFees, lateFees] = await Promise.all([
-      WeeklyModel.getServicesByDateRange(rangeStart, rangeEnd),
-      WeeklyModel.getExpensesByDateRange(rangeStart, rangeEnd),
-      WeeklyModel.getAdvancesByDateRange(rangeStart, rangeEnd),
-      WeeklyModel.getTagFeesByDateRange(rangeStart, rangeEnd),
-      WeeklyModel.getLateFeesByDateRange(rangeStart, rangeEnd)
+      WeeklyModel.getServicesByDateRange(mondayUTC, sundayUTC),
+      WeeklyModel.getExpensesByDateRange(mondayUTC, sundayUTC),
+      WeeklyModel.getAdvancesByDateRange(mondayUTC, sundayUTC),
+      WeeklyModel.getTagFeesByDateRange(mondayUTC, sundayUTC),
+      WeeklyModel.getLateFeesByDateRange(mondayUTC, sundayUTC)
     ]);
 
-    console.log("weekly services in the controller", services.rows);
-    console.log("weekly expenses in the controller", expenses.rows);
-    console.log("weekly advances in the controller", advances.rows);
-    console.log("weekly tag fees in the controller", tagFees.rows);
-    console.log("weekly late fees in the controller", lateFees.rows);
+    console.log("Weekly services fetched:", services);
 
     res.json({
-      scenario, // for debugging which case fired
-      services: services,
-      expenses: expenses,
-      advances: advances,
-      tagFees: tagFees,
-      lateFees: lateFees
+      services,
+      expenses: expenses.rows,
+      advances: advances.rows,
+      tagFees: tagFees.rows,
+      lateFees: lateFees.rows
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching weekly report:", err);
     res.status(500).json({ error: "Server error" });
   }
 };

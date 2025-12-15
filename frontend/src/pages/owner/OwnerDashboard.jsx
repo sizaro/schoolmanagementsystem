@@ -15,10 +15,15 @@ import io from "socket.io-client";
 
 
 export default function OwnerDashboard() {
+      const staticBaseUrl =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5500"
+    : "https://salonmanagementsystemv2.onrender.com";
   const [modalType, setModalType] = useState(null);
   const [salonStatus, setSalonStatus] = useState("closed");
   const [selectedFee, setSelectedFee] = useState(null);
   const [edittingServiceDefinition, setEdittingServiceDefinition] = useState(null);
+  const [edittingSection, setEdittingSection] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelServiceId, setCancelServiceId] = useState(null);
   const [activeTab, setActiveTab] = useState("pending");
@@ -63,7 +68,8 @@ export default function OwnerDashboard() {
     fetchServiceTransactions,
     fetchServiceTransactionsApp,
     pendingCount,
-    pendingAppointments
+    pendingAppointments,
+    fetchSectionById
   } = useData();
 
 
@@ -243,9 +249,16 @@ export default function OwnerDashboard() {
     }
   };
 
-  const handleEditSection = async (sectionOrId) => {
-   await setSelectedItem(item);
-    setModalType("edit_section");
+  const handleEditSection = async (id) => {
+
+    try {
+        const sectionobj = await fetchSectionById(id);
+        await setEdittingSection(sectionobj);
+        setModalType("edit_section");
+      } catch (err) {
+        console.error("Failed to fetch:", err);
+      }
+
   };
 
   const handleEditServiceDefinition = async (id) => {
@@ -270,8 +283,8 @@ export default function OwnerDashboard() {
 
   const handleUpdateSection = async (formData) => {
     try {
-      if (!selectedItem || !selectedItem.id) throw new Error("No section selected for update");
-      await updateSection(selectedItem.id, formData);
+      if (!edittingSection || !edittingSection.id) throw new Error("No section selected for update");
+      await updateSection(formData.id, formData);
       closeModal();
     } catch (err) {
       console.error("Failed to update section", err);
@@ -467,7 +480,7 @@ export default function OwnerDashboard() {
                   <tr key={section.id}>
                     <td className="border px-4 py-2">{section.section_name}</td>
                     <td className="border px-4 py-2 flex gap-2">
-                      <Button onClick={() => handleEditSection(section)}>Edit</Button>
+                      <Button onClick={() => handleEditSection(section.id)}>Edit</Button>
                       <Button onClick={() => handleDeleteSectionClick(section.id)}>Delete</Button>
                     </td>
                   </tr>
@@ -487,6 +500,7 @@ export default function OwnerDashboard() {
             <thead>
               <tr className="bg-gray-100">
                 <th className="border px-4 py-2 text-left">Name</th>
+                <th className="border px-4 py-2 text-left">Image</th>
                 <th className="border px-4 py-2 text-left">Section</th>
                 <th className="border px-4 py-2 text-left">Roles</th>
                 <th className="border px-4 py-2 text-left">Other Services</th>
@@ -506,6 +520,7 @@ export default function OwnerDashboard() {
                   const totalMaterials = sumMaterialsCost(materials);
 
                   const displayName = service.name || service.service_name || service.serviceName || "N/A";
+                  const displayImage = `${staticBaseUrl}${service.image_url}` || `image`
                   const displaySalon = (service.salon_amount ?? service.salonAmount ?? service.salon) || "0";
                   const displayFull = (service.full_amount ?? service.service_amount ?? service.price) || "0";
 
@@ -518,6 +533,7 @@ export default function OwnerDashboard() {
                   return (
                     <tr key={service.id}>
                       <td className="border px-4 py-2 align-top">{displayName}</td>
+                      <td className="border px-4 py-2 align-top"><img src={displayImage} alt={displayName} /></td>
                       <td className="border px-4 py-2 align-top">{sectionName}</td>
                       <td className="border px-4 py-2 align-top">
                         {roles && roles.length > 0 ? (
@@ -580,7 +596,7 @@ export default function OwnerDashboard() {
           {modalType === "tagfee" && <TagFeeForm onSubmit={CreateTagFee} onClose={closeModal} feeData={selectedFee} employees={Employees || []} />}
           {modalType === "latefee" && <LateFeeForm onSubmit={CreateLateFee} onClose={closeModal} feeData={selectedFee} employees={Employees || []} />}
           {modalType === "new_section" && <SectionForm onSubmit={createSection} onClose={closeModal} sectionData={null} />}
-          {modalType === "edit_section" && <SectionForm onSubmit={handleUpdateSection} onClose={closeModal} sectionData={selectedItem} />}
+          {modalType === "edit_section" && <SectionForm onSubmit={handleUpdateSection} onClose={closeModal} existingSection={edittingSection} />}
           {modalType === "new_service_definition" && <NewServiceForm onSubmit={handleAddServiceDefinition} onClose={closeModal} Sections={sections} />}
           {modalType === "edit_service_definition" && <NewServiceForm onSubmit={handleUpdateServiceDefinition} onClose={closeModal} Sections={sections} serviceData={edittingServiceDefinition} />}
         </Modal>

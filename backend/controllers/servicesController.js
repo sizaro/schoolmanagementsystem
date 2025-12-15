@@ -46,6 +46,7 @@ export const getServiceDefinitionById = async (req, res) => {
 };
 
 // CREATE SERVICE DEFINITION
+
 export const createServiceDefinition = async (req, res) => {
   try {
     const {
@@ -54,27 +55,52 @@ export const createServiceDefinition = async (req, res) => {
       salon_amount,
       section_id,
       description,
-      roles = [],
-      materials = [],
     } = req.body;
 
-    let service_image = null;
-    if (req.file) service_image = req.file.filename;
+    console.log("FILE:", req.file);
+    console.log("BODY:", req.body);
 
-    const data = { service_name, service_amount, salon_amount, section_id, description, service_image, roles, materials };
+    const parseMaybeJSON = (value) => {
+      if (!value) return [];
+      if (typeof value === "string") return JSON.parse(value);
+      return value;
+    };
+
+    const roles = parseMaybeJSON(req.body.roles);
+    const materials = parseMaybeJSON(req.body.materials);
+
+    const service_image = req.file
+      ? `/uploads/images/${req.file.filename}`
+      : null;
+
+    const data = {
+      service_name,
+      service_amount,
+      salon_amount,
+      section_id,
+      description,
+      service_image,
+      roles,
+      materials,
+    };
 
     const newService = await createServiceDefinitionModel(data);
-    res.json({ success: true, data: newService });
+
+    res.status(201).json({ success: true, data: newService });
   } catch (err) {
-    console.error(err);
+    console.error("Error creating service definition:", err);
     res.status(500).json({ success: false, message: "Failed to create service" });
   }
 };
 
+
+
 // UPDATE SERVICE DEFINITION
+
 export const updateServiceDefinition = async (req, res) => {
   try {
     const { id } = req.params;
+
     const {
       service_name,
       service_amount,
@@ -85,14 +111,42 @@ export const updateServiceDefinition = async (req, res) => {
       materials = [],
     } = req.body;
 
-    let service_image = null;
-    if (req.file) service_image = req.file.filename;
+    if (!id) {
+      return res.status(400).json({ success: false, message: "Missing service ID" });
+    }
 
-    const data = { service_name, service_amount, salon_amount, section_id, description, service_image, roles, materials };
+    const existingService = await fetchServiceDefinitionByIdModel(id);
+    if (!existingService) {
+      return res.status(404).json({ success: false, message: "Service not found" });
+    }
+
+    let service_image = existingService.image_url;
+
+    if (req.file && req.file.filename) {
+      if (existingService.service_image) {
+        const oldPath = path.join(process.cwd(), existingService.service_image);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
+
+      service_image = `/uploads/images/${req.file.filename}`;
+    }
+
+    const data = {
+      service_name,
+      service_amount,
+      salon_amount,
+      section_id,
+      description,
+      service_image,
+      roles,
+      materials,
+    };
+
     const updatedService = await updateServiceDefinitionModel(id, data);
+
     res.json({ success: true, data: updatedService });
   } catch (err) {
-    console.error(err);
+    console.error("Error updating service definition:", err);
     res.status(500).json({ success: false, message: "Failed to update service" });
   }
 };
@@ -117,17 +171,60 @@ export const deleteServiceDefinition = async (req, res) => {
 // CREATE SERVICE TRANSACTION
 export const createServiceTransaction = async (req, res) => {
   try {
-    const { service_definition_id, created_by, appointment_date, appointment_time, customer_id, customer_note, status, performers = [] } = req.body;
+    const {
+      service_definition_id,
+      created_by,
+      appointment_date,
+      appointment_time,
+      customer_id,
+      customer_note,
+      status,
+      performers = []
+    } = req.body;
 
-    const data = { service_definition_id, created_by, appointment_date, appointment_time, customer_id, customer_note, status, performers };
+    const data = {
+      service_definition_id,
+      created_by,
+      appointment_date,
+      appointment_time,
+      customer_id,
+      customer_note,
+      status,
+      performers
+    };
 
     const transaction = await saveServiceTransaction(data);
+
+    // 🔥 SOCKET IO EMITS
+    const io = req.app.get("io") || global.io;
+
+    if (io) {
+      const isAppointment =
+        appointment_date !== null &&
+        appointment_time !== null &&
+        status !== null &&
+        status == "pending";
+
+      if (isAppointment) {
+        io.emit("appointment_created", {
+          id: transaction.id,
+          data: transaction,
+        });
+        console.log("📢 Emitted appointment_created");
+      }
+    }
+
     res.json({ success: true, data: transaction });
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Failed to create service transaction" });
+    res.status(500).json({
+      success: false,
+      message: "Failed to create service transaction",
+    });
   }
 };
+
 
 // GET ALL SERVICE TRANSACTIONS
 export const getAllServiceTransactions = async (req, res) => {

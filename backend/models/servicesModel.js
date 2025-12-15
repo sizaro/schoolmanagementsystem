@@ -111,6 +111,8 @@ export const createServiceDefinitionModel = async (data) => {
 export const updateServiceDefinitionModel = async (id, data) => {
   console.log("id inside the update service definition", id)
   const { service_name, service_amount, salon_amount, section_id, description, service_image, roles = [], materials = [] } = data;
+  console.log("SERVICE IMAGE SENT TO MODEL:", service_image);
+
   try {
     await db.query("BEGIN");
 
