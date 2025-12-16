@@ -36,9 +36,10 @@ const pendingCount = pendingAppointments.length;
 
   const navigate = useNavigate();
 
-  const API_URL = import.meta.env.VITE_API_URL || "/api";
+  const API_URL = import.meta.env.VITE_API_URL || "https://salonmanagementsystemv2.onrender.com";
 
   const socket = io(API_URL.replace("/api", ""), {
+    withCredentials: true,
   transports: ["websocket"],
   secure: true
 });
@@ -297,7 +298,9 @@ const pendingCount = pendingAppointments.length;
 
   const deleteAdvance = async (id) => {
     try {
-      await axios.delete(`${API_URL}/advances/${id}`);
+      await axios.delete(`${API_URL}/advances/${id}`, {
+  withCredentials: true,
+});
       await fetchAdvances();
     } catch (err) {
       console.error("Error deleting advance:", err);
@@ -351,7 +354,9 @@ const pendingCount = pendingAppointments.length;
 
   const deleteExpense = async (id) => {
     try {
-      await axios.delete(`${API_URL}/expenses/${id}`);
+      await axios.delete(`${API_URL}/expenses/${id}`, {
+  withCredentials: true,
+});
       await fetchExpenses();
     } catch (err) {
       console.error("Error deleting expense:", err);
@@ -405,7 +410,9 @@ const pendingCount = pendingAppointments.length;
 
   const deleteLateFee = async (id) => {
     try {
-      await axios.delete(`${API_URL}/fees/late_fees/${id}`);
+      await axios.delete(`${API_URL}/fees/late_fees/${id}`, {
+  withCredentials: true,
+});
       await fetchLateFees();
     } catch (err) {
       console.error("Error deleting late fee:", err);
@@ -459,7 +466,9 @@ const pendingCount = pendingAppointments.length;
 
   const deleteTagFee = async (id) => {
     try {
-      await axios.delete(`${API_URL}/fees/tag/${id}`);
+      await axios.delete(`${API_URL}/fees/tag/${id}`, {
+  withCredentials: true,
+});
       await fetchTagFees();
     } catch (err) {
       console.error("Error deleting tag fee:", err);
@@ -520,7 +529,9 @@ const updateSection = async (id, sectionData) => {
 
 const deleteSection = async (id) => {
   try {
-    await axios.delete(`${API_URL}/sections/${id}`);
+    await axios.delete(`${API_URL}/sections/${id}`, {
+  withCredentials: true,
+});
     await fetchSections();
   } catch (err) {
     console.error("Error deleting section:", err);
@@ -586,7 +597,9 @@ const updateServiceDefinition = async (id, serviceData) => {
 // ---------- DELETE SERVICE DEFINITION ----------
 const deleteServiceDefinition = async (id) => {
   try {
-    await axios.delete(`${API_URL}/services/service_definitions/${id}`);
+    await axios.delete(`${API_URL}/services/service_definitions/${id}`, {
+  withCredentials: true,
+});
     await fetchServiceDefinitions(); // refresh after deletion
   } catch (err) {
     console.error("Error deleting service definition:", err);
@@ -682,7 +695,7 @@ const fetchServiceTransactionsApp = async () => {
     console.log("service appointments in the data context", res.data.data)
     return res.data.data;
   } catch (err) {
-    console.error("Error fetching service transactions:", err);
+    console.error("Error fetching service transactions appointments:", err);
     throw err;
   }
 };
@@ -700,7 +713,9 @@ const fetchServiceTransactionById = async (id) => {
 
 const deleteServiceTransaction = async (id) => {
   try {
-    await axios.delete(`${API_URL}/services/service_transactions/${id}`);
+    await axios.delete(`${API_URL}/services/service_transactions/${id}`, {
+  withCredentials: true,
+});
     await fetchServiceDefinitions(); // refresh after deletion
   } catch (err) {
     console.error("Error deleting service transaction:", err);

@@ -121,14 +121,6 @@ app.use("/uploads/images", express.static(path.join(__dirname, "/uploads/images"
 
 
 // --- Routes ---
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    message: "Backend is alive",
-    time: new Date().toISOString()
-  });
-});
-
 app.use("/api/services", servicesRoutes);
 app.use("/api/servicet", serviceRoutet);
 app.use("/api/expenses", expensesRoutes);
