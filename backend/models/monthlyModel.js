@@ -73,19 +73,21 @@ export const getServicesByMonth = async (year, month) => {
 // EXPENSES
 // ===============================
 
+
 export const getExpensesByMonth = async (year, month) => {
   const query = `
     SELECT *
     FROM expenses
     WHERE
-      EXTRACT(YEAR FROM (created_at AT TIME ZONE 'Africa/Kampala')) = $1
-      AND EXTRACT(MONTH FROM (created_at AT TIME ZONE 'Africa/Kampala')) = $2
+      EXTRACT(YEAR FROM created_at) = $1
+      AND EXTRACT(MONTH FROM created_at) = $2
     ORDER BY id DESC;
   `;
 
   const { rows } = await db.query(query, [year, month]);
   return rows;
 };
+
 
 // ===============================
 // SALARY ADVANCES
@@ -100,15 +102,14 @@ export const getAdvancesByMonth = async (year, month) => {
     FROM advances a
     LEFT JOIN users u ON a.employee_id = u.id
     WHERE
-      EXTRACT(YEAR FROM (a.created_at AT TIME ZONE 'Africa/Kampala')) = $1
-      AND EXTRACT(MONTH FROM (a.created_at AT TIME ZONE 'Africa/Kampala')) = $2
+      EXTRACT(YEAR FROM a.created_at) = $1
+      AND EXTRACT(MONTH FROM a.created_at) = $2
     ORDER BY a.id DESC;
   `;
 
   const { rows } = await db.query(query, [year, month]);
   return rows;
 };
-
 
 // ===============================
 // TAG FEES
@@ -122,8 +123,8 @@ export const getTagFeesByMonth = async (year, month) => {
     FROM tag_fee tf
     LEFT JOIN users u ON tf.employee_id = u.id
     WHERE
-      EXTRACT(YEAR FROM (tf.created_at AT TIME ZONE 'Africa/Kampala')) = $1
-      AND EXTRACT(MONTH FROM (tf.created_at AT TIME ZONE 'Africa/Kampala')) = $2
+      EXTRACT(YEAR FROM tf.created_at) = $1
+      AND EXTRACT(MONTH FROM tf.created_at) = $2
     ORDER BY tf.id DESC;
   `;
 
@@ -131,9 +132,11 @@ export const getTagFeesByMonth = async (year, month) => {
   return rows;
 };
 
+
 // ===============================
 // LATE FEES
 // ===============================
+
 
 export const getLateFeesByMonth = async (year, month) => {
   const query = `
@@ -143,14 +146,15 @@ export const getLateFeesByMonth = async (year, month) => {
     FROM late_fees lf
     LEFT JOIN users u ON lf.employee_id = u.id
     WHERE
-      EXTRACT(YEAR FROM (lf.created_at AT TIME ZONE 'Africa/Kampala')) = $1
-      AND EXTRACT(MONTH FROM (lf.created_at AT TIME ZONE 'Africa/Kampala')) = $2
+      EXTRACT(YEAR FROM lf.created_at) = $1
+      AND EXTRACT(MONTH FROM lf.created_at) = $2
     ORDER BY lf.id DESC;
   `;
 
   const { rows } = await db.query(query, [year, month]);
   return rows;
 };
+
 
 
 // ===============================

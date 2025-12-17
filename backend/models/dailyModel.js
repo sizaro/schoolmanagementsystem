@@ -1,6 +1,7 @@
 import db from './database.js';
 
-export const getServicesByDay = async (startOfDay, endOfDay) => {
+export const getServicesByDay = async (dateString) => {
+  console.log("date string in models", dateString)
   const query = `
     SELECT 
       st.id AS transaction_id,
@@ -55,14 +56,13 @@ export const getServicesByDay = async (startOfDay, endOfDay) => {
       WHERE sm.service_definition_id = sd.id
     ) mat ON TRUE
 
-    WHERE 
-      (st.service_timestamp) BETWEEN $1 AND $2
+      WHERE st.service_timestamp::DATE = $1
       AND (st.status IS NULL OR LOWER(st.status) = 'completed')
 
     ORDER BY st.service_timestamp DESC;
   `;
 
-  const { rows } = await db.query(query, [startOfDay, endOfDay]);
+  const { rows } = await db.query(query, [dateString]);
 
   // deduplicate materials
   return rows.map(row => {
@@ -83,18 +83,24 @@ export const getServicesByDay = async (startOfDay, endOfDay) => {
 // ===============================
 // EXPENSES
 // ===============================
-async function getExpensesByDay(startOfDay, endOfDay) {
-  const result = await db.query(
-    "SELECT * FROM expenses WHERE created_at BETWEEN $1 AND $2 ORDER BY id DESC",
-    [startOfDay, endOfDay]
-  );
-  return result.rows;
-}
+
+export const getExpensesByDay = async (dateString) => {
+  const query = `
+    SELECT *
+    FROM expenses
+    WHERE created_at::DATE = $1
+    ORDER BY id DESC;
+  `;
+  const { rows } = await db.query(query, [dateString]);
+  return rows;
+};
+
 
 // ===============================
 // SALARY ADVANCES
 // ===============================
-async function getAdvancesByDay(startOfDay, endOfDay) {
+
+export const getAdvancesByDay = async (dateString) => {
   const query = `
     SELECT 
       a.*,
@@ -102,17 +108,19 @@ async function getAdvancesByDay(startOfDay, endOfDay) {
       u.last_name
     FROM advances a
     LEFT JOIN users u ON a.employee_id = u.id
-    WHERE a.created_at BETWEEN $1 AND $2
+    WHERE a.created_at::DATE = $1
     ORDER BY a.id DESC;
   `;
-  const result = await db.query(query, [startOfDay, endOfDay]);
-  return result.rows;
-}
+  const { rows } = await db.query(query, [dateString]);
+  return rows;
+};
+
 
 // ===============================
 // EMPLOYEE CLOCKINGS
 // ===============================
-async function getClockingsByDay(startOfDay, endOfDay) {
+
+export const getClockingsByDay = async (dateString) => {
   const query = `
     SELECT 
       ec.*,
@@ -120,43 +128,52 @@ async function getClockingsByDay(startOfDay, endOfDay) {
       u.last_name
     FROM employee_clocking ec
     LEFT JOIN users u ON ec.employee_id = u.id
-    WHERE ec.clock_in BETWEEN $1 AND $2
+    WHERE ec.clock_in::DATE = $1
     ORDER BY ec.id DESC;
   `;
-  const result = await db.query(query, [startOfDay, endOfDay]);
-  return result.rows;
-}
+  const { rows } = await db.query(query, [dateString]);
+  return rows;
+};
+
 
 
 // ===============================
 // TAG FEES
 // ===============================
-async function getTagFeesByDay(startOfDay, endOfDay) {
+
+export const getTagFeesByDay = async (dateString) => {
   const query = `
-    SELECT tf.*, CONCAT(u.first_name, '', u.last_name) AS employee_name
+    SELECT 
+      tf.*, 
+      CONCAT(u.first_name, ' ', u.last_name) AS employee_name
     FROM tag_fee tf
     LEFT JOIN users u ON tf.employee_id = u.id
-    WHERE tf.created_at BETWEEN $1 AND $2
+    WHERE tf.created_at::DATE = $1
     ORDER BY tf.id DESC;
   `;
-  const result = await db.query(query, [startOfDay, endOfDay]);
-  return result.rows;
-}
+  const { rows } = await db.query(query, [dateString]);
+  return rows;
+};
+
 
 // ===============================
 // LATE FEES
 // ===============================
-async function getLateFeesByDay(startOfDay, endOfDay) {
+
+export const getLateFeesByDay = async (dateString) => {
   const query = `
-    SELECT lf.*, CONCAT(u.first_name, '', u.last_name) AS employee_name
+    SELECT 
+      lf.*, 
+      CONCAT(u.first_name, ' ', u.last_name) AS employee_name
     FROM late_fees lf
     LEFT JOIN users u ON lf.employee_id = u.id
-    WHERE lf.created_at BETWEEN $1 AND $2
+    WHERE lf.created_at::DATE = $1
     ORDER BY lf.id DESC;
   `;
-  const result = await db.query(query, [startOfDay, endOfDay]);
-  return result.rows;
-}
+  const { rows } = await db.query(query, [dateString]);
+  return rows;
+};
+
 
 // ===============================
 // EMPLOYEES (Users with role employee/manager/owner)

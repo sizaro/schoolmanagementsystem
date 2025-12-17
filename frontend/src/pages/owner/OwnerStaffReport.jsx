@@ -19,8 +19,23 @@ export default function OwnerStaffReport() {
     fetchYearlyData,
   } = useData();
 
-  const toYMD = (date) => date.toISOString().split("T")[0];
+  
+    const toYMD = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+
   const today = new Date();
+  const options = {
+  weekday: "long",
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "Africa/Kampala",
+};;
 
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [selectedDate, setSelectedDate] = useState(toYMD(today));

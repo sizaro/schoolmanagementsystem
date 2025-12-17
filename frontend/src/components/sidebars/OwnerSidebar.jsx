@@ -76,8 +76,8 @@ export default function OwnerSidebar() {
             <li><Link to="/owner/employee-report" className={linkClass('/owner/employee-report')}>Employee Report</Link></li>
             <li><Link to="/owner/advances" className={linkClass('/owner/advances')}>Employees Advances</Link></li>
             <li><Link to="/owner/staff-performance" className={linkClass('/owner/staff-performance')}>Staff Performance</Link></li>
-            <li><Link to="/owner/late-fees-report" className={linkClass('/owner/late-fees-report')}>Late Fees Reports</Link></li>
-            <li><Link to="/owner/tag-fees-report" className={linkClass('/owner/tag-fees-report')}>Tag Fees Reports</Link></li>
+            {/* <li><Link to="/owner/late-fees-report" className={linkClass('/owner/late-fees-report')}>Late Fees Reports</Link></li>
+            <li><Link to="/owner/tag-fees-report" className={linkClass('/owner/tag-fees-report')}>Tag Fees Reports</Link></li> */}
             <li className='mt-10'><SidebarFooter /></li>
           </ul>
         </div>
@@ -97,11 +97,12 @@ export default function OwnerSidebar() {
             <li><Link to="/owner/dashboard" onClick={() => setMenuOpen(false)} className={linkClass('/owner/dashboard')}>Dashboard</Link></li>
             <li><Link to="/owner/income-report" onClick={() => setMenuOpen(false)} className={linkClass('/owner/income-report')}>Income Reports</Link></li>
             <li><Link to="/owner/expenses-report" onClick={() => setMenuOpen(false)} className={linkClass('/owner/expenses-report')}>Expenses Reports</Link></li>
+            <li><Link to="/owner/employees-management" className={linkClass('/owner/employee-management')}>Employee Management</Link></li>
             <li><Link to="/owner/employee-report" onClick={() => setMenuOpen(false)} className={linkClass('/owner/employee-report')}>Employee Report</Link></li>
             <li><Link to="/owner/advances" onClick={() => setMenuOpen(false)} className={linkClass('/owner/advances')}>Employees Advances</Link></li>
             <li><Link to="/owner/staff-performance" onClick={() => setMenuOpen(false)} className={linkClass('/owner/staff-performance')}>Staff Performance</Link></li>
-            <li><Link to="/owner/late-fees-report" onClick={() => setMenuOpen(false)} className={linkClass('/owner/late-fees-report')}>Late Fees Reports</Link></li>
-            <li><Link to="/owner/tag-fees-report" onClick={() => setMenuOpen(false)} className={linkClass('/owner/tag-fees-report')}>Tag Fees Reports</Link></li>
+            {/* <li><Link to="/owner/late-fees-report" onClick={() => setMenuOpen(false)} className={linkClass('/owner/late-fees-report')}>Late Fees Reports</Link></li>
+            <li><Link to="/owner/tag-fees-report" onClick={() => setMenuOpen(false)} className={linkClass('/owner/tag-fees-report')}>Tag Fees Reports</Link></li> */}
             <li className='mt-10'><SidebarFooter /></li>
           </ul>
         </div>
